@@ -936,6 +936,34 @@ h1 {
   gap: 14px;
 }
 
+.deal-section {
+  display: grid;
+  gap: 12px;
+}
+
+.deal-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.deal-section-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.deal-section-heading span {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  color: #111;
+  background: var(--gold);
+  font-weight: 900;
+}
+
 .deal-card {
   display: flex;
   align-items: center;
