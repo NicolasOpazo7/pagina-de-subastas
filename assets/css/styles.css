@@ -461,6 +461,11 @@ h1 {
   padding: 22px;
 }
 
+.card-detail-link {
+  display: inline-flex;
+  margin-top: 8px;
+}
+
 .card-topline,
 .bid-row {
   display: flex;
@@ -617,6 +622,143 @@ h1 {
 
 .delete-preview p {
   margin: 0;
+  color: var(--muted);
+}
+
+.product-detail-main {
+  padding: 42px 6vw 88px;
+}
+
+.back-link {
+  display: inline-flex;
+  margin-bottom: 24px;
+}
+
+.product-detail-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.product-detail-gallery,
+.product-detail-info,
+.bid-history-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.product-detail-gallery {
+  padding: 16px;
+}
+
+.product-detail-gallery > img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #09090a;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+.detail-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.detail-thumb {
+  padding: 0;
+  overflow: hidden;
+  background: #09090a;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  aspect-ratio: 1;
+}
+
+.detail-thumb.is-active {
+  border-color: var(--gold);
+}
+
+.detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail-info {
+  padding: 30px;
+}
+
+.product-detail-info h1 {
+  margin-bottom: 18px;
+  font-size: clamp(2.2rem, 5vw, 4.6rem);
+}
+
+.product-detail-description {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.detail-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 26px 0;
+}
+
+.detail-stats div {
+  padding: 16px;
+  background: var(--surface-light);
+  border: 1px solid var(--line);
+}
+
+.detail-stats strong {
+  display: block;
+  color: var(--gold-soft);
+  font-size: 1.35rem;
+}
+
+.detail-bid-button {
+  width: 100%;
+  cursor: pointer;
+}
+
+.detail-bid-button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1) brightness(0.7);
+}
+
+.bid-history-panel {
+  margin-top: 24px;
+}
+
+.bid-history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bid-history-item {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  background: var(--surface-light);
+  border: 1px solid var(--line);
+}
+
+.bid-history-item span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.bid-history-item strong {
+  color: var(--gold-soft);
+}
+
+.bid-history-item small {
   color: var(--muted);
 }
 
@@ -1285,6 +1427,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .product-detail-shell {
+    grid-template-columns: 1fr;
+  }
+
   .filter-panel {
     left: 20px;
   }
@@ -1378,6 +1524,11 @@ h1 {
     padding-right: 20px;
   }
 
+  .product-detail-main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .panel-heading,
   .seller-product,
   .user-bid-card,
@@ -1421,6 +1572,10 @@ h1 {
 
   .chat-message {
     max-width: 100%;
+  }
+
+  .bid-history-item {
+    grid-template-columns: 1fr;
   }
 
   .form-row {
