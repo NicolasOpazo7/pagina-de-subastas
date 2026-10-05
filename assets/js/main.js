@@ -316,6 +316,8 @@ async function loadProductsFromSupabase() {
     return;
   }
 
+  await closeExpiredAuctions();
+
   const { data, error } = await db
     .from("products")
     .select("id, title, description, category, image_url, current_price, ends_at, is_featured, product_images(image_url, display_order)")
