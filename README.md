@@ -30,15 +30,11 @@ http://localhost:5500
 
 ## Supabase
 
-Ejecuta `database/supabase-schema.sql` en el SQL Editor de Supabase cuando cambie el modelo de datos.
+Para una instalacion nueva, ejecuta `database/migrations/001_initial_schema.sql` en el SQL Editor de Supabase. Ese archivo deja listas las tablas, funciones, bucket de imagenes, permisos y politicas RLS.
 
-Si hay errores de Storage al subir imagenes, ejecuta tambien `database/storage-setup.sql`.
+Los scripts antiguos en `database/` como `fix-product-publication.sql`, `fix-product-delete.sql` y `storage-setup.sql` quedan como referencia de correcciones puntuales. Para trabajar desde cero usa la migracion consolidada.
 
-Si aparece `Could not find the table 'public.product_images' in the schema cache`, ejecuta `database/fix-product-publication.sql`.
-
-Si el subastador no puede eliminar productos por RLS, ejecuta `database/fix-product-delete.sql`.
-
-Para activar los acuerdos de venta y el chat despues de finalizar una subasta, ejecuta `database/auction-deals.sql`.
+Mas detalle: `database/README.md`.
 
 Para Google OAuth, agrega en Supabase como redirect permitido:
 
