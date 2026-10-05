@@ -21,6 +21,7 @@ const bidCurrentPrice = document.querySelector("#bid-current-price");
 const bidAmount = document.querySelector("#bid-amount");
 const bidError = document.querySelector("#bid-error");
 const bidStatus = document.querySelector("#bid-status");
+const bidSubmit = bidForm.querySelector("[type='submit']");
 
 let currentProduct = null;
 
@@ -165,6 +166,10 @@ function closeBidModal() {
 }
 
 async function placeBid(amount) {
+  if (bidSubmit.disabled) {
+    return;
+  }
+
   const user = await getSessionUser();
 
   if (!user) {
@@ -178,23 +183,28 @@ async function placeBid(amount) {
   }
 
   bidStatus.textContent = "Enviando oferta...";
+  setLoading(bidSubmit, true, "Enviando...");
 
-  const { data, error } = await db.rpc("place_bid", {
-    product_id: currentProduct.id,
-    bid_amount: amount
-  });
+  try {
+    const { data, error } = await db.rpc("place_bid", {
+      product_id: currentProduct.id,
+      bid_amount: amount
+    });
 
-  if (error) {
-    bidStatus.textContent = "";
-    bidError.textContent = error.message;
-    return;
+    if (error) {
+      bidStatus.textContent = "";
+      bidError.textContent = getErrorMessage(error);
+      return;
+    }
+
+    currentProduct = { ...currentProduct, current_price: data.current_price };
+    detailCurrentPrice.textContent = formatPrice(data.current_price);
+    closeBidModal();
+    detailStatus.textContent = "Oferta enviada correctamente.";
+    await loadBidHistory(currentProduct.id);
+  } finally {
+    setLoading(bidSubmit, false);
   }
-
-  currentProduct = { ...currentProduct, current_price: data.current_price };
-  detailCurrentPrice.textContent = formatPrice(data.current_price);
-  closeBidModal();
-  detailStatus.textContent = "Oferta enviada correctamente.";
-  await loadBidHistory(currentProduct.id);
 }
 
 async function loadProductDetail() {
