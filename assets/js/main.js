@@ -177,6 +177,7 @@ function applyInitialCategoryFromUrl() {
 function renderProductCard(product) {
   const card = document.createElement("article");
   const images = getProductImages(product);
+  const detailUrl = `pages/producto.html?id=${encodeURIComponent(product.id)}`;
   card.className = "product-card";
   card.dataset.id = product.id;
   card.dataset.name = product.title;
@@ -201,6 +202,7 @@ function renderProductCard(product) {
       </div>
       <h3>${escapeHtml(product.title)}</h3>
       <p>${escapeHtml(product.description)}</p>
+      <a class="text-link card-detail-link" href="${detailUrl}">Ver detalle</a>
       <div class="bid-row">
         <div>
           <span class="label">Oferta mas alta</span>
@@ -309,8 +311,23 @@ function bindBidButtons() {
   });
 }
 
+function bindStaticDetailLinks() {
+  productCards.forEach((card) => {
+    if (card.querySelector(".card-detail-link") || !card.dataset.id) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.className = "text-link card-detail-link";
+    link.href = `pages/producto.html?id=${encodeURIComponent(card.dataset.id)}`;
+    link.textContent = "Ver detalle";
+    card.querySelector(".card-content")?.insertBefore(link, card.querySelector(".bid-row"));
+  });
+}
+
 async function loadProductsFromSupabase() {
   if (!window.supabase || !db) {
+    bindStaticDetailLinks();
     bindBidButtons();
     applyProductFilters();
     return;
@@ -326,6 +343,7 @@ async function loadProductsFromSupabase() {
     .order("created_at", { ascending: false });
 
   if (error || !data || data.length === 0) {
+    bindStaticDetailLinks();
     bindBidButtons();
     applyProductFilters();
     return;
