@@ -37,6 +37,14 @@ Esta actualizacion crea la funcion `close_expired_auctions()`, que:
 - crea o actualiza el acuerdo post-subasta en `auction_deals`;
 - devuelve cuantas subastas cerro y cuantos acuerdos preparo.
 
+Si ya tienes la base creada y necesitas activar el historial anonimo de pujas para la pagina de detalle, ejecuta:
+
+```text
+database/migrations/003_product_bid_history.sql
+```
+
+Esta actualizacion crea la funcion `get_product_bid_history(product_id)`, que devuelve montos y fechas de pujas sin exponer datos personales del usuario que oferta.
+
 ## Archivos legacy
 
 Los archivos de la carpeta `database/` que empiezan con `fix-` o `storage-setup.sql` se mantienen como referencia historica de correcciones puntuales. Para instalaciones nuevas, usa la migracion consolidada.
