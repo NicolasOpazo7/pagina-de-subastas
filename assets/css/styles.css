@@ -229,6 +229,15 @@ h1 {
   filter: brightness(1.06);
 }
 
+.button:disabled,
+.bid-row button:disabled,
+.google-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  filter: grayscale(0.35);
+}
+
 .featured-section {
   padding: 72px 6vw 88px;
 }
