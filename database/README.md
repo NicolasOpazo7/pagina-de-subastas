@@ -22,6 +22,21 @@ Esta migracion incluye:
 - politicas RLS;
 - recarga de cache de PostgREST.
 
+## Actualizaciones incrementales
+
+Si ya ejecutaste la migracion inicial antes de que existiera el cierre automatico de subastas, ejecuta:
+
+```text
+database/migrations/002_close_expired_auctions.sql
+```
+
+Esta actualizacion crea la funcion `close_expired_auctions()`, que:
+
+- cierra productos con `status = 'open'` cuya fecha `ends_at` ya paso;
+- busca la puja ganadora;
+- crea o actualiza el acuerdo post-subasta en `auction_deals`;
+- devuelve cuantas subastas cerro y cuantos acuerdos preparo.
+
 ## Archivos legacy
 
 Los archivos de la carpeta `database/` que empiezan con `fix-` o `storage-setup.sql` se mantienen como referencia historica de correcciones puntuales. Para instalaciones nuevas, usa la migracion consolidada.
