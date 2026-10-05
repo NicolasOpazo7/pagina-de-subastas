@@ -17,7 +17,10 @@ const sellerTotal = document.querySelector("#seller-total");
 const sellerFeatured = document.querySelector("#seller-featured");
 const sellerHighest = document.querySelector("#seller-highest");
 const dealPanel = document.querySelector("#deal-panel");
-const dealList = document.querySelector("#deal-list");
+const activeDealList = document.querySelector("#active-deal-list");
+const completedDealList = document.querySelector("#completed-deal-list");
+const activeDealsCount = document.querySelector("#active-deals-count");
+const completedDealsCount = document.querySelector("#completed-deals-count");
 const dealEmpty = document.querySelector("#deal-empty");
 const logoutButton = document.querySelector("#logout-button");
 const editModal = document.querySelector("#edit-product-modal");
@@ -61,6 +64,7 @@ let sellerProductList = [];
 let dealItems = [];
 let pendingDeleteProductId = null;
 let activeDealId = null;
+let activeDealChannel = null;
 
 function getBidStatus(bid) {
   if (!bid.products) {
@@ -202,7 +206,23 @@ function dealStatusLabel(deal) {
   return "Coordinando venta";
 }
 
-function renderDeal(deal) {
+function getDealProgressText(deal) {
+  if (deal.status === "completed") {
+    return "Ambas partes confirmaron la venta.";
+  }
+
+  if (deal.buyer_confirmed && !deal.seller_confirmed) {
+    return "Falta confirmacion del subastador.";
+  }
+
+  if (!deal.buyer_confirmed && deal.seller_confirmed) {
+    return "Falta confirmacion del comprador.";
+  }
+
+  return "Ambas partes deben confirmar el acuerdo.";
+}
+
+function renderDeal(deal, targetList) {
   const product = deal.products;
   const article = document.createElement("article");
   article.className = "deal-card";
@@ -211,13 +231,14 @@ function renderDeal(deal) {
       <span class="bid-status ${deal.status === "completed" ? "is-winning" : "is-closed"}">${dealStatusLabel(deal)}</span>
       <h3>${escapeHtml(product?.title || "Producto finalizado")}</h3>
       <p>${escapeHtml(product?.category || "Sin categoria")} &middot; Con ${escapeHtml(getCounterpartName(deal))}</p>
+      <p>${escapeHtml(getDealProgressText(deal))}</p>
     </div>
     <div class="deal-card-side">
       <strong>${formatPrice(deal.final_price)}</strong>
       <button class="button button-primary" type="button" data-open-deal="${deal.id}">Abrir acuerdo</button>
     </div>
   `;
-  dealList.appendChild(article);
+  targetList.appendChild(article);
 }
 
 function bindDealActions() {
@@ -288,10 +309,17 @@ async function loadDeals() {
   }
 
   dealItems = data || [];
-  dealList.innerHTML = "";
+  const activeDeals = dealItems.filter((deal) => deal.status !== "completed");
+  const completedDeals = dealItems.filter((deal) => deal.status === "completed");
+
+  activeDealList.innerHTML = "";
+  completedDealList.innerHTML = "";
   dealPanel.hidden = dealItems.length === 0;
   dealEmpty.hidden = dealItems.length > 0;
-  dealItems.forEach(renderDeal);
+  activeDealsCount.textContent = String(activeDeals.length);
+  completedDealsCount.textContent = String(completedDeals.length);
+  activeDeals.forEach((deal) => renderDeal(deal, activeDealList));
+  completedDeals.forEach((deal) => renderDeal(deal, completedDealList));
   bindDealActions();
 }
 
@@ -415,6 +443,40 @@ async function loadDealMessages(dealId) {
   dealMessages.scrollTop = dealMessages.scrollHeight;
 }
 
+function unsubscribeDealMessages() {
+  if (activeDealChannel) {
+    db.removeChannel(activeDealChannel);
+    activeDealChannel = null;
+  }
+}
+
+function subscribeDealMessages(dealId) {
+  unsubscribeDealMessages();
+
+  activeDealChannel = db
+    .channel(`deal-messages-${dealId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "deal_messages",
+        filter: `deal_id=eq.${dealId}`
+      },
+      async () => {
+        if (activeDealId === dealId) {
+          await loadDealMessages(dealId);
+          dealStatus.textContent = "Chat actualizado.";
+        }
+      }
+    )
+    .subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        dealStatus.textContent = "Chat en vivo activo.";
+      }
+    });
+}
+
 async function openDealModal(dealId) {
   const deal = dealItems.find((item) => item.id === dealId);
 
@@ -430,9 +492,11 @@ async function openDealModal(dealId) {
   renderDealConfirmation(deal);
   dealModal.hidden = false;
   await loadDealMessages(deal.id);
+  subscribeDealMessages(deal.id);
 }
 
 function closeDealModal() {
+  unsubscribeDealMessages();
   dealModal.hidden = true;
   activeDealId = null;
   dealMessages.innerHTML = "";
