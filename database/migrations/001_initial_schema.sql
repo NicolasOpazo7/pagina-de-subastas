@@ -470,6 +470,35 @@ begin
 end;
 $$;
 
+create or replace function public.get_product_bid_history(target_product_id uuid)
+returns table(amount numeric, created_at timestamptz)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select b.amount, b.created_at
+  from public.bids b
+  join public.products p on p.id = b.product_id
+  where b.product_id = target_product_id
+    and (
+      p.status = 'open'
+      or p.seller_id = auth.uid()
+      or b.bidder_id = auth.uid()
+      or public.is_admin(auth.uid())
+      or exists (
+        select 1
+        from public.auction_deals ad
+        where ad.product_id = p.id
+          and (
+            ad.seller_id = auth.uid()
+            or ad.buyer_id = auth.uid()
+          )
+      )
+    )
+  order by b.amount desc, b.created_at asc;
+$$;
+
 alter table public.profiles enable row level security;
 alter table public.products enable row level security;
 alter table public.bids enable row level security;
@@ -500,6 +529,7 @@ grant execute on function public.user_bid_on_product(uuid, uuid) to authenticate
 grant execute on function public.ensure_auction_deal(uuid) to authenticated;
 grant execute on function public.mark_deal_confirmation(uuid, boolean) to authenticated;
 grant execute on function public.close_expired_auctions() to anon, authenticated;
+grant execute on function public.get_product_bid_history(uuid) to anon, authenticated;
 
 drop policy if exists "Todos pueden ver productos abiertos" on public.products;
 create policy "Todos pueden ver productos abiertos"
