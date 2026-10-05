@@ -76,9 +76,14 @@ function handleLogin() {
   const password = form.querySelector("#login-password");
   const status = document.querySelector("#login-status");
   const googleButton = document.querySelector("#google-login");
+  const submitButton = form.querySelector("[type='submit']");
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    if (submitButton.disabled) {
+      return;
+    }
 
     const isValid = validateEmail(email) && validatePassword(password);
 
@@ -88,35 +93,50 @@ function handleLogin() {
     }
 
     status.textContent = "Ingresando...";
+    setLoading(submitButton, true, "Ingresando...");
 
-    const { error } = await db.auth.signInWithPassword({
-      email: email.value.trim(),
-      password: password.value
-    });
+    try {
+      const { error } = await db.auth.signInWithPassword({
+        email: email.value.trim(),
+        password: password.value
+      });
 
-    if (error) {
-      status.textContent = error.message;
-      return;
+      if (error) {
+        status.textContent = getErrorMessage(error);
+        return;
+      }
+
+      window.location.href = "perfil.html";
+    } finally {
+      setLoading(submitButton, false);
     }
-
-    window.location.href = "perfil.html";
   });
 
   if (googleButton) {
     googleButton.addEventListener("click", async () => {
-      const { error } = await db.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: getRedirectUrl("perfil.html"),
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent"
-          }
-        }
-      });
+      if (googleButton.disabled) {
+        return;
+      }
 
-      if (error) {
-        status.textContent = error.message;
+      setLoading(googleButton, true, "Conectando...");
+
+      try {
+        const { error } = await db.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: getRedirectUrl("perfil.html"),
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent"
+            }
+          }
+        });
+
+        if (error) {
+          status.textContent = getErrorMessage(error);
+        }
+      } finally {
+        setLoading(googleButton, false);
       }
     });
   }
@@ -136,9 +156,14 @@ function handleRegister() {
   const confirmPassword = form.querySelector("#register-confirm-password");
   const status = document.querySelector("#register-status");
   const googleButton = document.querySelector("#google-register");
+  const submitButton = form.querySelector("[type='submit']");
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    if (submitButton.disabled) {
+      return;
+    }
 
     const isValidName = validateRequiredText(name);
     const isValidEmail = validateEmail(email);
@@ -151,43 +176,58 @@ function handleRegister() {
     }
 
     status.textContent = "Creando cuenta...";
+    setLoading(submitButton, true, "Creando...");
 
-    const { error } = await db.auth.signUp({
-      email: email.value.trim(),
-      password: password.value,
-      options: {
-        data: {
-          full_name: name.value.trim(),
-          role: role.value
-        }
-      }
-    });
-
-    if (error) {
-      status.textContent = error.message;
-      return;
-    }
-
-    status.textContent = "Cuenta creada. Revisa tu correo si Supabase pide confirmacion.";
-  });
-
-  if (googleButton) {
-    googleButton.addEventListener("click", async () => {
-      localStorage.setItem("aurum_pending_google_role", role.value || "usuario");
-
-      const { error } = await db.auth.signInWithOAuth({
-        provider: "google",
+    try {
+      const { error } = await db.auth.signUp({
+        email: email.value.trim(),
+        password: password.value,
         options: {
-          redirectTo: getRedirectUrl("perfil.html"),
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent"
+          data: {
+            full_name: name.value.trim(),
+            role: role.value
           }
         }
       });
 
       if (error) {
-        status.textContent = error.message;
+        status.textContent = getErrorMessage(error);
+        return;
+      }
+
+      status.textContent = "Cuenta creada. Revisa tu correo si Supabase pide confirmacion.";
+      form.reset();
+    } finally {
+      setLoading(submitButton, false);
+    }
+  });
+
+  if (googleButton) {
+    googleButton.addEventListener("click", async () => {
+      if (googleButton.disabled) {
+        return;
+      }
+
+      localStorage.setItem("aurum_pending_google_role", role.value || "usuario");
+      setLoading(googleButton, true, "Conectando...");
+
+      try {
+        const { error } = await db.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: getRedirectUrl("perfil.html"),
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent"
+            }
+          }
+        });
+
+        if (error) {
+          status.textContent = getErrorMessage(error);
+        }
+      } finally {
+        setLoading(googleButton, false);
       }
     });
   }
