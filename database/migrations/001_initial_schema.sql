@@ -908,6 +908,20 @@ where p.role in ('subastador', 'admin')
   and not exists (select 1 from public.products)
 limit 3;
 
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'deal_messages'
+  ) then
+    alter publication supabase_realtime add table public.deal_messages;
+  end if;
+end
+$$;
+
 notify pgrst, 'reload schema';
 
 -- Para crear el admin:
