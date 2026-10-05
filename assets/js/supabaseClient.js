@@ -17,6 +17,12 @@ async function getSessionUser() {
   return data.user;
 }
 
+async function closeExpiredAuctions() {
+  const { error } = await db.rpc("close_expired_auctions");
+
+  return !error;
+}
+
 function formatPrice(value) {
   return new Intl.NumberFormat("es-CL", {
     style: "currency",
