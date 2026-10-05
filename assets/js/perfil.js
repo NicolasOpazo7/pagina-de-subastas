@@ -35,6 +35,7 @@ const editFeatured = document.querySelector("#edit-featured");
 const editImageList = document.querySelector("#edit-image-list");
 const editImages = document.querySelector("#edit-images");
 const editStatus = document.querySelector("#edit-status");
+const editSubmit = editForm.querySelector("[type='submit']");
 const deleteModal = document.querySelector("#delete-product-modal");
 const deleteModalClose = document.querySelector("#delete-modal-close");
 const deleteProductCopy = document.querySelector("#delete-product-copy");
@@ -56,6 +57,7 @@ const dealSellerStatus = document.querySelector("#deal-seller-status");
 const dealMessages = document.querySelector("#deal-messages");
 const dealMessageForm = document.querySelector("#deal-message-form");
 const dealMessageInput = document.querySelector("#deal-message-input");
+const dealMessageSubmit = dealMessageForm.querySelector("[type='submit']");
 const refreshDeal = document.querySelector("#refresh-deal");
 const confirmDeal = document.querySelector("#confirm-deal");
 const dealStatus = document.querySelector("#deal-status");
@@ -507,12 +509,17 @@ function closeDealModal() {
 async function sendDealMessage(event) {
   event.preventDefault();
 
+  if (dealMessageSubmit.disabled) {
+    return;
+  }
+
   if (!activeDealId || !dealMessageInput.value.trim()) {
     return;
   }
 
   try {
     dealStatus.textContent = "Enviando mensaje...";
+    setLoading(dealMessageSubmit, true, "Enviando...");
     const { error } = await db.from("deal_messages").insert({
       deal_id: activeDealId,
       sender_id: currentUserId,
@@ -520,19 +527,25 @@ async function sendDealMessage(event) {
     });
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(getErrorMessage(error));
     }
 
     dealMessageInput.value = "";
     dealStatus.textContent = "";
     await loadDealMessages(activeDealId);
   } catch (error) {
-    dealStatus.textContent = error.message;
+    dealStatus.textContent = getErrorMessage(error);
+  } finally {
+    setLoading(dealMessageSubmit, false);
   }
 }
 
 async function confirmActiveDeal() {
   const deal = getActiveDeal();
+
+  if (confirmDeal.disabled) {
+    return;
+  }
 
   if (!deal) {
     return;
@@ -540,13 +553,14 @@ async function confirmActiveDeal() {
 
   try {
     dealStatus.textContent = "Guardando confirmacion...";
+    setLoading(confirmDeal, true, "Guardando...");
     const { data, error } = await db.rpc("mark_deal_confirmation", {
       target_deal_id: activeDealId,
       confirmed: true
     });
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(getErrorMessage(error));
     }
 
     const updatedDeal = Array.isArray(data) ? data[0] : data;
@@ -561,7 +575,16 @@ async function confirmActiveDeal() {
       : "Tu confirmacion quedo guardada.";
     await loadDeals();
   } catch (error) {
-    dealStatus.textContent = error.message;
+    dealStatus.textContent = getErrorMessage(error);
+  } finally {
+    const updatedDeal = getActiveDeal();
+    const shouldStayDisabled = updatedDeal
+      && (updatedDeal.status === "completed"
+        || (updatedDeal.buyer_id === currentUserId && updatedDeal.buyer_confirmed)
+        || (updatedDeal.seller_id === currentUserId && updatedDeal.seller_confirmed));
+
+    setLoading(confirmDeal, false);
+    confirmDeal.disabled = Boolean(shouldStayDisabled);
   }
 }
 
@@ -708,6 +731,10 @@ async function addImagesToProduct(product) {
 async function saveProductChanges(event) {
   event.preventDefault();
 
+  if (editSubmit.disabled) {
+    return;
+  }
+
   const product = sellerProductList.find((item) => item.id === editProductId.value);
 
   if (!product) {
@@ -719,8 +746,14 @@ async function saveProductChanges(event) {
     return;
   }
 
+  if (!isFutureDateTime(editEnds.value)) {
+    editStatus.textContent = "La fecha de cierre debe ser posterior al momento actual.";
+    return;
+  }
+
   try {
     editStatus.textContent = "Guardando cambios...";
+    setLoading(editSubmit, true, "Guardando...");
 
     const { error } = await db
       .from("products")
@@ -734,7 +767,7 @@ async function saveProductChanges(event) {
       .eq("id", product.id);
 
     if (error) {
-      throw new Error(`No se pudo actualizar el producto: ${error.message}`);
+      throw new Error(`No se pudo actualizar el producto: ${getErrorMessage(error)}`);
     }
 
     await addImagesToProduct(product);
@@ -742,7 +775,9 @@ async function saveProductChanges(event) {
     await loadSellerProducts(currentUserId);
     closeEditModal();
   } catch (error) {
-    editStatus.textContent = error.message;
+    editStatus.textContent = getErrorMessage(error);
+  } finally {
+    setLoading(editSubmit, false);
   }
 }
 
@@ -769,7 +804,7 @@ async function deleteProductImage(imageId) {
     const { error } = await db.from("product_images").delete().eq("id", image.id);
 
     if (error) {
-      throw new Error(`No se pudo eliminar la imagen: ${error.message}`);
+      throw new Error(`No se pudo eliminar la imagen: ${getErrorMessage(error)}`);
     }
 
     await loadSellerProducts(currentUserId);
@@ -777,7 +812,7 @@ async function deleteProductImage(imageId) {
     renderImageManager(updatedProduct);
     editStatus.textContent = "Imagen eliminada.";
   } catch (error) {
-    editStatus.textContent = error.message;
+    editStatus.textContent = getErrorMessage(error);
   }
 }
 
@@ -790,7 +825,7 @@ async function deleteProduct(productId) {
 
   try {
     deleteStatus.textContent = "Eliminando producto...";
-    confirmDelete.disabled = true;
+    setLoading(confirmDelete, true, "Eliminando...");
 
     const storagePaths = sortedImages(product)
       .map((image) => image.storage_path)
@@ -799,7 +834,7 @@ async function deleteProduct(productId) {
     const { error } = await db.from("products").delete().eq("id", product.id);
 
     if (error) {
-      throw new Error(`No se pudo eliminar el producto: ${error.message}`);
+      throw new Error(`No se pudo eliminar el producto: ${getErrorMessage(error)}`);
     }
 
     if (storagePaths.length) {
@@ -809,9 +844,9 @@ async function deleteProduct(productId) {
     await loadSellerProducts(currentUserId);
     closeDeleteModal();
   } catch (error) {
-    deleteStatus.textContent = error.message;
+    deleteStatus.textContent = getErrorMessage(error);
   } finally {
-    confirmDelete.disabled = false;
+    setLoading(confirmDelete, false);
   }
 }
 
