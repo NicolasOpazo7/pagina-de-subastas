@@ -5,7 +5,7 @@ Proyecto web de subastas con HTML, CSS, JavaScript y Supabase.
 ## Estructura
 
 - `index.html`: pagina principal y listado de productos.
-- `pages/`: pantallas de login, registro, perfil y publicacion de productos.
+- `pages/`: pantallas de login, registro, perfil, detalle y publicacion de productos.
 - `assets/css/`: estilos del sitio.
 - `assets/js/`: logica de autenticacion, productos, pujas y Supabase.
 - `database/`: SQL para crear tablas, politicas y funciones en Supabase.
@@ -33,6 +33,8 @@ http://localhost:5500
 Para una instalacion nueva, ejecuta `database/migrations/001_initial_schema.sql` en el SQL Editor de Supabase. Ese archivo deja listas las tablas, funciones, bucket de imagenes, permisos y politicas RLS.
 
 Si ya tienes la base creada y solo necesitas agregar el cierre automatico de subastas vencidas, ejecuta `database/migrations/002_close_expired_auctions.sql`.
+
+Si necesitas activar el historial anonimo de pujas en la pagina de detalle, ejecuta `database/migrations/003_product_bid_history.sql`.
 
 Los scripts antiguos en `database/` como `fix-product-publication.sql`, `fix-product-delete.sql` y `storage-setup.sql` quedan como referencia de correcciones puntuales. Para trabajar desde cero usa la migracion consolidada.
 
