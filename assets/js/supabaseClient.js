@@ -23,6 +23,38 @@ async function closeExpiredAuctions() {
   return !error;
 }
 
+function getErrorMessage(error, fallback = "Ocurrio un error inesperado.") {
+  return error?.message || fallback;
+}
+
+function setLoading(control, isLoading, loadingText = "Procesando...") {
+  if (!control) {
+    return;
+  }
+
+  if (isLoading) {
+    control.dataset.originalText = control.textContent;
+    control.textContent = loadingText;
+    control.disabled = true;
+    return;
+  }
+
+  control.disabled = false;
+
+  if (control.dataset.originalText) {
+    control.textContent = control.dataset.originalText;
+    delete control.dataset.originalText;
+  }
+}
+
+function isFutureDateTime(value) {
+  if (!value) {
+    return false;
+  }
+
+  return new Date(value).getTime() > Date.now();
+}
+
 function formatPrice(value) {
   return new Intl.NumberFormat("es-CL", {
     style: "currency",
