@@ -771,6 +771,7 @@ async function loadProfile() {
   }
 
   currentUserId = user.id;
+  await closeExpiredAuctions();
 
   const { data: profile, error } = await db
     .from("profiles")
