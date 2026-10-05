@@ -19,6 +19,7 @@ const bidCurrentPrice = document.querySelector("#bid-current-price");
 const bidAmount = document.querySelector("#bid-amount");
 const bidError = document.querySelector("#bid-error");
 const bidStatus = document.querySelector("#bid-status");
+const bidSubmit = bidForm.querySelector("[type='submit']");
 let productCards = Array.from(document.querySelectorAll(".product-card"));
 let activeBidProduct = null;
 
@@ -268,6 +269,10 @@ function closeBidModal() {
 }
 
 async function placeBid(productId, amount) {
+  if (bidSubmit.disabled) {
+    return;
+  }
+
   const user = await getSessionUser();
 
   if (!user) {
@@ -281,28 +286,33 @@ async function placeBid(productId, amount) {
   }
 
   bidStatus.textContent = "Enviando oferta...";
+  setLoading(bidSubmit, true, "Enviando...");
 
-  const { data, error } = await db.rpc("place_bid", {
-    product_id: productId,
-    bid_amount: amount
-  });
+  try {
+    const { data, error } = await db.rpc("place_bid", {
+      product_id: productId,
+      bid_amount: amount
+    });
 
-  if (error) {
-    bidStatus.textContent = "";
-    bidError.textContent = error.message;
-    return;
+    if (error) {
+      bidStatus.textContent = "";
+      bidError.textContent = getErrorMessage(error);
+      return;
+    }
+
+    const card = productCards.find((item) => item.dataset.id === data.id);
+
+    if (card) {
+      card.dataset.price = data.current_price;
+      card.dataset.currentPrice = data.current_price;
+      card.querySelector(".bid-row strong").textContent = formatPrice(data.current_price);
+    }
+
+    closeBidModal();
+    applyProductFilters();
+  } finally {
+    setLoading(bidSubmit, false);
   }
-
-  const card = productCards.find((item) => item.dataset.id === data.id);
-
-  if (card) {
-    card.dataset.price = data.current_price;
-    card.dataset.currentPrice = data.current_price;
-    card.querySelector(".bid-row strong").textContent = formatPrice(data.current_price);
-  }
-
-  closeBidModal();
-  applyProductFilters();
 }
 
 function bindBidButtons() {
