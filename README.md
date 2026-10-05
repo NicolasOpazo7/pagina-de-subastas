@@ -36,6 +36,8 @@ Si ya tienes la base creada y solo necesitas agregar el cierre automatico de sub
 
 Si necesitas activar el historial anonimo de pujas en la pagina de detalle, ejecuta `database/migrations/003_product_bid_history.sql`.
 
+Si necesitas activar actualizacion en vivo del chat de acuerdos, ejecuta `database/migrations/004_deal_messages_realtime.sql`.
+
 Los scripts antiguos en `database/` como `fix-product-publication.sql`, `fix-product-delete.sql` y `storage-setup.sql` quedan como referencia de correcciones puntuales. Para trabajar desde cero usa la migracion consolidada.
 
 Mas detalle: `database/README.md`.
