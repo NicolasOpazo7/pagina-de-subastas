@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check assets/js/supabaseClient.js && node --check assets/js/auth.js && node --check assets/js/main.js && node --check assets/js/perfil.js && node --check assets/js/subir-producto.js && node --check server.js"
+    "check": "node --check assets/js/supabaseClient.js && node --check assets/js/auth.js && node --check assets/js/main.js && node --check assets/js/perfil.js && node --check assets/js/producto.js && node --check assets/js/subir-producto.js && node --check server.js"
   },
   "keywords": [
     "subastas",
