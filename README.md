@@ -32,6 +32,8 @@ http://localhost:5500
 
 Para una instalacion nueva, ejecuta `database/migrations/001_initial_schema.sql` en el SQL Editor de Supabase. Ese archivo deja listas las tablas, funciones, bucket de imagenes, permisos y politicas RLS.
 
+Si ya tienes la base creada y solo necesitas agregar el cierre automatico de subastas vencidas, ejecuta `database/migrations/002_close_expired_auctions.sql`.
+
 Los scripts antiguos en `database/` como `fix-product-publication.sql`, `fix-product-delete.sql` y `storage-setup.sql` quedan como referencia de correcciones puntuales. Para trabajar desde cero usa la migracion consolidada.
 
 Mas detalle: `database/README.md`.
