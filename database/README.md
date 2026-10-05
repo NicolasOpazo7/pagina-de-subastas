@@ -45,6 +45,14 @@ database/migrations/003_product_bid_history.sql
 
 Esta actualizacion crea la funcion `get_product_bid_history(product_id)`, que devuelve montos y fechas de pujas sin exponer datos personales del usuario que oferta.
 
+Si necesitas que el chat de acuerdos se actualice en vivo, ejecuta:
+
+```text
+database/migrations/004_deal_messages_realtime.sql
+```
+
+Esta actualizacion agrega `public.deal_messages` a la publicacion `supabase_realtime`, necesaria para que Supabase envie eventos nuevos al navegador.
+
 ## Archivos legacy
 
 Los archivos de la carpeta `database/` que empiezan con `fix-` o `storage-setup.sql` se mantienen como referencia historica de correcciones puntuales. Para instalaciones nuevas, usa la migracion consolidada.
