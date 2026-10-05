@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir producto | Aurum Subastas</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabaseClient.js"></script>
+  <script src="../assets/js/subir-producto.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">A</span>
+      <span>Aurum Subastas</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegacion principal">
+      <a href="../index.html">Inicio</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger">Categorias</button>
+        <div class="nav-dropdown-menu">
+          <a href="../index.html?category=tecnologia#productos">Tecnologia</a>
+          <a href="../index.html?category=joyeria#productos">Joyeria</a>
+          <a href="../index.html?category=hogar#productos">Hogar</a>
+          <a href="../index.html?category=relojeria#productos">Relojeria</a>
+          <a href="../index.html?category=musica#productos">Musica</a>
+          <a href="../index.html?category=fotografia#productos">Fotografia</a>
+        </div>
+      </div>
+      <a href="subir-producto.html" class="active">Publicar producto</a>
+      <a href="perfil.html">Perfil</a>
+    </nav>
+  </header>
+
+  <main class="profile-main">
+    <section class="profile-hero">
+      <p class="eyebrow">Nueva subasta</p>
+      <h1>Subir producto</h1>
+      <p>Publica un producto con imagenes, precio inicial y fecha de cierre para que los usuarios puedan ofertar.</p>
+    </section>
+
+    <section class="upload-layout">
+      <aside class="upload-note">
+        <p class="eyebrow">Datos necesarios</p>
+        <p>Usa un nombre claro, una descripcion breve, una categoria consistente y varias imagenes desde tu dispositivo para que la card se vea completa en la pagina principal.</p>
+        <p>Solo las cuentas con rol de subastador pueden publicar productos.</p>
+      </aside>
+
+      <article class="upload-card">
+        <form class="product-form" id="upload-product-form">
+          <div class="form-group">
+            <label for="product-title">Nombre del producto</label>
+            <input type="text" id="product-title" required>
+          </div>
+          <div class="form-group">
+            <label for="product-description">Descripcion</label>
+            <textarea id="product-description" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-category">Categoria</label>
+              <select id="product-category" required>
+                <option value="tecnologia">Tecnologia</option>
+                <option value="joyeria">Joyeria</option>
+                <option value="hogar">Hogar</option>
+                <option value="relojeria">Relojeria</option>
+                <option value="musica">Musica</option>
+                <option value="fotografia">Fotografia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="product-price">Precio inicial</label>
+              <input type="number" id="product-price" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-images">Imagenes</label>
+              <input type="file" id="product-images" accept="image/*" multiple required>
+              <small class="field-hint">Puedes subir entre 1 y 10 imagenes.</small>
+            </div>
+            <div class="form-group">
+              <label for="product-ends">Fecha de cierre</label>
+              <input type="datetime-local" id="product-ends" required>
+            </div>
+          </div>
+          <label class="checkbox-filter" for="product-featured">
+            <input type="checkbox" id="product-featured">
+            Marcar como destacado
+          </label>
+          <button class="button button-primary auth-submit" type="submit">Publicar producto</button>
+          <p class="form-status" id="upload-status" aria-live="polite"></p>
+        </form>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

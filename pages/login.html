@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesi&oacute;n | Aurum Subastas</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabaseClient.js"></script>
+  <script src="../assets/js/auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">A</span>
+      <span>Aurum Subastas</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegacion principal">
+      <a href="../index.html">Inicio</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger">Categorias</button>
+        <div class="nav-dropdown-menu">
+          <a href="../index.html?category=tecnologia#productos">Tecnologia</a>
+          <a href="../index.html?category=joyeria#productos">Joyeria</a>
+          <a href="../index.html?category=hogar#productos">Hogar</a>
+          <a href="../index.html?category=relojeria#productos">Relojeria</a>
+          <a href="../index.html?category=musica#productos">Musica</a>
+          <a href="../index.html?category=fotografia#productos">Fotografia</a>
+        </div>
+      </div>
+      <a href="subir-producto.html">Publicar producto</a>
+      <a href="perfil.html" class="active">Perfil</a>
+    </nav>
+  </header>
+
+  <main class="auth-main">
+    <section class="auth-card" aria-labelledby="login-title">
+      <p class="eyebrow">Bienvenido de vuelta</p>
+      <h1 id="login-title">Iniciar sesi&oacute;n</h1>
+      <p class="auth-copy">Accede para ofertar, publicar productos y revisar tus subastas activas.</p>
+
+      <form class="auth-form" id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-email">Correo</label>
+          <input type="email" id="login-email" name="email" autocomplete="email" placeholder="tu@email.com" required>
+          <small class="error-message" data-error-for="login-email"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Contrase&ntilde;a</label>
+          <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Ingresa tu contrase&ntilde;a" required minlength="6">
+          <small class="error-message" data-error-for="login-password"></small>
+        </div>
+
+        <button class="button button-primary auth-submit" type="submit">Ingresar</button>
+        <p class="form-status" id="login-status" aria-live="polite"></p>
+      </form>
+
+      <div class="auth-divider"><span>o</span></div>
+      <button class="google-button" type="button" id="google-login">
+        <span class="google-icon">G</span>
+        Ingresar con Google
+      </button>
+
+      <p class="auth-switch">&iquest;No tienes cuenta? <a href="registro.html">Registrarse</a></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil | Aurum Subastas</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabaseClient.js"></script>
+  <script src="../assets/js/perfil.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">A</span>
+      <span>Aurum Subastas</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegacion principal">
+      <a href="../index.html">Inicio</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger">Categorias</button>
+        <div class="nav-dropdown-menu">
+          <a href="../index.html?category=tecnologia#productos">Tecnologia</a>
+          <a href="../index.html?category=joyeria#productos">Joyeria</a>
+          <a href="../index.html?category=hogar#productos">Hogar</a>
+          <a href="../index.html?category=relojeria#productos">Relojeria</a>
+          <a href="../index.html?category=musica#productos">Musica</a>
+          <a href="../index.html?category=fotografia#productos">Fotografia</a>
+        </div>
+      </div>
+      <a href="subir-producto.html">Publicar producto</a>
+      <a href="perfil.html" class="active">Perfil</a>
+    </nav>
+  </header>
+
+  <main class="profile-main">
+    <section class="profile-hero">
+      <p class="eyebrow">Mi cuenta</p>
+      <h1 id="profile-title">Perfil</h1>
+      <p id="profile-description">Cargando informacion de tu cuenta...</p>
+    </section>
+
+    <section class="profile-dashboard">
+      <aside class="profile-panel profile-sidebar">
+        <div class="panel-heading">
+          <h2>Datos</h2>
+          <button class="button button-secondary" type="button" id="logout-button">Cerrar sesion</button>
+        </div>
+        <dl class="profile-data">
+          <div>
+            <dt>Nombre</dt>
+            <dd id="profile-name">-</dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd id="profile-email">-</dd>
+          </div>
+          <div>
+            <dt>Rol</dt>
+            <dd id="profile-role">-</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <section class="profile-content">
+        <article class="profile-panel" id="admin-panel" hidden>
+          <h2>Panel administrador</h2>
+          <p>Desde este rol podras revisar usuarios, productos y actividad general de la plataforma.</p>
+        </article>
+
+        <article class="profile-panel" id="user-panel" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Actividad</p>
+              <h2>Mis pujas</h2>
+            </div>
+            <a class="button button-primary" href="../index.html#productos">Ver subastas</a>
+          </div>
+
+          <div class="seller-summary">
+            <div>
+              <span class="label">Pujas activas</span>
+              <strong id="user-bids-total">0</strong>
+            </div>
+            <div>
+              <span class="label">Vas ganando</span>
+              <strong id="user-winning-total">0</strong>
+            </div>
+            <div>
+              <span class="label">Mayor puja</span>
+              <strong id="user-highest-bid">$0</strong>
+            </div>
+          </div>
+
+          <div class="user-bids" id="user-bids"></div>
+          <p class="empty-results" id="user-bids-empty" hidden>No tienes pujas activas todavia.</p>
+        </article>
+
+        <article class="profile-panel seller-management" id="seller-panel" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Gestion</p>
+              <h2>Mis productos</h2>
+            </div>
+            <a class="button button-primary" href="subir-producto.html">Nuevo producto</a>
+          </div>
+
+          <div class="seller-summary">
+            <div>
+              <span class="label">Publicados</span>
+              <strong id="seller-total">0</strong>
+            </div>
+            <div>
+              <span class="label">Destacados</span>
+              <strong id="seller-featured">0</strong>
+            </div>
+            <div>
+              <span class="label">Oferta mayor</span>
+              <strong id="seller-highest">$0</strong>
+            </div>
+          </div>
+
+          <div class="seller-products" id="seller-products"></div>
+          <p class="empty-results" id="seller-empty" hidden>No tienes productos publicados todavia.</p>
+        </article>
+
+        <article class="profile-panel deal-management" id="deal-panel" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Post-subasta</p>
+              <h2>Acuerdos de venta</h2>
+            </div>
+          </div>
+
+          <div class="deal-list" id="deal-list"></div>
+          <p class="empty-results" id="deal-empty" hidden>No hay acuerdos de venta por ahora.</p>
+        </article>
+      </section>
+    </section>
+
+    <div class="modal-backdrop" id="edit-product-modal" hidden>
+      <section class="edit-modal-card" role="dialog" aria-modal="true" aria-labelledby="edit-product-title">
+        <button class="filter-close modal-close" type="button" id="edit-modal-close" aria-label="Cerrar edicion">X</button>
+        <p class="eyebrow">Editar subasta</p>
+        <h2 id="edit-product-title">Editar producto</h2>
+
+        <form class="product-form" id="edit-product-form">
+          <input type="hidden" id="edit-product-id">
+          <div class="form-group">
+            <label for="edit-title">Nombre del producto</label>
+            <input type="text" id="edit-title" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-description">Descripcion</label>
+            <textarea id="edit-description" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-category">Categoria</label>
+              <select id="edit-category" required>
+                <option value="tecnologia">Tecnologia</option>
+                <option value="joyeria">Joyeria</option>
+                <option value="hogar">Hogar</option>
+                <option value="relojeria">Relojeria</option>
+                <option value="musica">Musica</option>
+                <option value="fotografia">Fotografia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-ends">Fecha de cierre</label>
+              <input type="datetime-local" id="edit-ends" required>
+            </div>
+          </div>
+          <label class="checkbox-filter" for="edit-featured">
+            <input type="checkbox" id="edit-featured">
+            Marcar como destacado
+          </label>
+
+          <div class="form-group">
+            <label>Imagenes actuales</label>
+            <div class="image-manager" id="edit-image-list"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-images">Agregar imagenes</label>
+            <input type="file" id="edit-images" accept="image/*" multiple>
+            <small class="field-hint">Maximo 10 imagenes en total por producto.</small>
+          </div>
+
+          <button class="button button-primary auth-submit" type="submit">Guardar cambios</button>
+          <p class="form-status" id="edit-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="delete-product-modal" hidden>
+      <section class="bid-modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-product-title">
+        <button class="filter-close modal-close" type="button" id="delete-modal-close" aria-label="Cerrar confirmacion">X</button>
+        <p class="eyebrow">Confirmar eliminacion</p>
+        <h2 id="delete-product-title">Eliminar producto</h2>
+        <p class="auth-copy" id="delete-product-copy">Esta accion no se puede deshacer.</p>
+        <div class="delete-preview" id="delete-preview"></div>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" id="cancel-delete">Cancelar</button>
+          <button class="button danger-button" type="button" id="confirm-delete">Eliminar producto</button>
+        </div>
+        <p class="form-status" id="delete-status" aria-live="polite"></p>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="logout-modal" hidden>
+      <section class="bid-modal-card" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+        <button class="filter-close modal-close" type="button" id="logout-modal-close" aria-label="Cerrar confirmacion">X</button>
+        <p class="eyebrow">Cerrar sesion</p>
+        <h2 id="logout-modal-title">¿Quieres salir de tu cuenta?</h2>
+        <p class="auth-copy">Para volver a ofertar, publicar productos o revisar tus acuerdos tendras que iniciar sesion nuevamente.</p>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" id="cancel-logout">Cancelar</button>
+          <button class="button danger-button" type="button" id="confirm-logout">Cerrar sesion</button>
+        </div>
+        <p class="form-status" id="logout-status" aria-live="polite"></p>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="deal-modal" hidden>
+      <section class="edit-modal-card deal-modal-card" role="dialog" aria-modal="true" aria-labelledby="deal-modal-title">
+        <button class="filter-close modal-close" type="button" id="deal-modal-close" aria-label="Cerrar acuerdo">X</button>
+        <p class="eyebrow">Acuerdo de venta</p>
+        <h2 id="deal-modal-title">Coordinar entrega</h2>
+        <p class="auth-copy" id="deal-modal-copy">Conversa con la otra parte para cerrar la venta.</p>
+
+        <div class="deal-status-grid">
+          <div>
+            <span class="label">Comprador</span>
+            <strong id="deal-buyer-status">Pendiente</strong>
+          </div>
+          <div>
+            <span class="label">Subastador</span>
+            <strong id="deal-seller-status">Pendiente</strong>
+          </div>
+        </div>
+
+        <div class="chat-thread" id="deal-messages"></div>
+
+        <form class="auth-form" id="deal-message-form">
+          <div class="form-group">
+            <label for="deal-message-input">Mensaje</label>
+            <textarea id="deal-message-input" placeholder="Escribe los detalles de entrega, pago o retiro..." required></textarea>
+          </div>
+          <button class="button button-primary auth-submit" type="submit">Enviar mensaje</button>
+        </form>
+
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" id="refresh-deal">Actualizar chat</button>
+          <button class="button button-primary" type="button" id="confirm-deal">Estoy de acuerdo</button>
+        </div>
+        <p class="form-status" id="deal-status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurum Subastas</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabaseClient.js"></script>
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">A</span>
+      <span>Aurum Subastas</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegacion principal">
+      <a href="index.html" class="active">Inicio</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger">Categorias</button>
+        <div class="nav-dropdown-menu">
+          <a href="index.html?category=tecnologia#productos">Tecnologia</a>
+          <a href="index.html?category=joyeria#productos">Joyeria</a>
+          <a href="index.html?category=hogar#productos">Hogar</a>
+          <a href="index.html?category=relojeria#productos">Relojeria</a>
+          <a href="index.html?category=musica#productos">Musica</a>
+          <a href="index.html?category=fotografia#productos">Fotografia</a>
+        </div>
+      </div>
+      <a href="pages/subir-producto.html">Publicar producto</a>
+      <a href="pages/perfil.html">Perfil</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Subastas destacadas</p>
+        <h1>Encuentra piezas unicas y oferta antes de que cierre el martillo.</h1>
+        <p class="hero-copy">
+          Explora productos publicados por la comunidad, revisa la oferta actual
+          y entra a competir por tus favoritos.
+        </p>
+        <div class="hero-actions">
+          <a href="#productos" class="button button-primary">Ver destacados</a>
+          <a href="pages/subir-producto.html" class="button button-secondary">Subir producto</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="featured-section" id="productos">
+      <div class="search-layout">
+        <button class="filter-toggle" type="button" id="filter-toggle" aria-controls="filter-panel" aria-expanded="false" aria-label="Abrir filtros">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <form class="search-form" id="search-form" role="search">
+          <label for="product-search">Buscar productos</label>
+          <input type="search" id="product-search" placeholder="Buscar por nombre, categoria o descripcion...">
+        </form>
+      </div>
+
+      <aside class="filter-panel" id="filter-panel" aria-label="Filtros de busqueda">
+        <div class="filter-panel-header">
+          <h3>Filtros</h3>
+          <button class="filter-close" type="button" id="filter-close" aria-label="Cerrar filtros">X</button>
+        </div>
+
+        <div class="filter-group">
+          <label for="category-filter">Categoria</label>
+          <select id="category-filter">
+            <option value="all">Todas</option>
+            <option value="relojeria">Relojeria</option>
+            <option value="joyeria">Joyeria</option>
+            <option value="tecnologia">Tecnologia</option>
+            <option value="hogar">Hogar</option>
+            <option value="musica">Musica</option>
+            <option value="fotografia">Fotografia</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="price-filter">Precio maximo</label>
+          <select id="price-filter">
+            <option value="all">Cualquier precio</option>
+            <option value="250000">Hasta $250.000</option>
+            <option value="500000">Hasta $500.000</option>
+            <option value="750000">Hasta $750.000</option>
+            <option value="1000000">Hasta $1.000.000</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="date-filter">Fecha de cierre</label>
+          <select id="date-filter">
+            <option value="all">Cualquier fecha</option>
+            <option value="today">Cierra hoy</option>
+            <option value="week">Esta semana</option>
+            <option value="later">Mas adelante</option>
+          </select>
+        </div>
+
+        <label class="checkbox-filter" for="featured-filter">
+          <input type="checkbox" id="featured-filter">
+          Solo destacados
+        </label>
+
+        <button class="button button-secondary clear-filters" type="button" id="clear-filters">Limpiar filtros</button>
+      </aside>
+
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">En tendencia</p>
+          <h2>Productos destacados</h2>
+        </div>
+        <p class="result-count" id="result-count">6 productos encontrados</p>
+      </div>
+
+      <div class="product-grid">
+        <article class="product-card" data-name="Reloj Automatico Heritage" data-category="relojeria" data-price="425000" data-date="today" data-featured="true">
+          <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=900&q=80" alt="Reloj clasico de acero sobre fondo oscuro">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Relojeria</span>
+              <span>02h 18m</span>
+            </div>
+            <h3>Reloj Automatico Heritage</h3>
+            <p>Movimiento visible, correa de cuero italiano y caja de acero pulido.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$425.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-name="Collar Aurea con Zafiro" data-category="joyeria" data-price="310000" data-date="today" data-featured="true">
+          <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=900&q=80" alt="Collar dorado con piedra brillante">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Joyeria</span>
+              <span>05h 42m</span>
+            </div>
+            <h3>Collar Aurea con Zafiro</h3>
+            <p>Pieza fina en oro laminado, ideal para coleccionistas y regalos especiales.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$310.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-name="Notebook Pro 15" data-category="tecnologia" data-price="890000" data-date="today" data-featured="true">
+          <img src="https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?auto=format&fit=crop&w=900&q=80" alt="Computador portatil encendido en un escritorio">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Tecnologia</span>
+              <span>11h 05m</span>
+            </div>
+            <h3>Notebook Pro 15</h3>
+            <p>Equipo de alto rendimiento con pantalla retina, SSD de 1 TB y garantia activa.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$890.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-name="Sillon Vintage Roble" data-category="hogar" data-price="185000" data-date="week" data-featured="false">
+          <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="Sillon elegante en una sala luminosa">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Hogar</span>
+              <span>1d 03h</span>
+            </div>
+            <h3>Sillon Vintage Roble</h3>
+            <p>Estructura restaurada, tapiz premium y terminaciones artesanales en madera.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$185.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-name="Guitarra Electrica Studio" data-category="musica" data-price="540000" data-date="week" data-featured="true">
+          <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=80" alt="Guitarra electrica apoyada junto a equipo musical">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Musica</span>
+              <span>2d 08h</span>
+            </div>
+            <h3>Guitarra Electrica Studio</h3>
+            <p>Cuerpo solido, pastillas dobles y estuche rigido incluido para transporte.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$540.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-name="Camara Mirrorless X100" data-category="fotografia" data-price="760000" data-date="later" data-featured="false">
+          <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80" alt="Camara fotografica profesional sobre mesa">
+          <div class="card-content">
+            <div class="card-topline">
+              <span>Fotografia</span>
+              <span>3d 12h</span>
+            </div>
+            <h3>Camara Mirrorless X100</h3>
+            <p>Sensor APS-C, lente fijo luminoso y accesorios originales en excelente estado.</p>
+            <div class="bid-row">
+              <div>
+                <span class="label">Oferta mas alta</span>
+                <strong>$760.000</strong>
+              </div>
+              <button>Ofertar</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <p class="empty-results" id="empty-results" hidden>No hay productos que coincidan con tu busqueda.</p>
+    </section>
+
+    <div class="modal-backdrop" id="bid-modal" hidden>
+      <section class="bid-modal-card" role="dialog" aria-modal="true" aria-labelledby="bid-modal-title">
+        <button class="filter-close modal-close" type="button" id="bid-modal-close" aria-label="Cerrar oferta">X</button>
+        <p class="eyebrow">Nueva oferta</p>
+        <h2 id="bid-modal-title">Hacer una oferta</h2>
+        <p class="auth-copy" id="bid-modal-product">Selecciona un producto para ofertar.</p>
+        <form class="auth-form" id="bid-form">
+          <div class="current-bid-box">
+            <span class="label">Oferta actual</span>
+            <strong id="bid-current-price">$0</strong>
+          </div>
+          <div class="form-group">
+            <label for="bid-amount">Tu oferta</label>
+            <input type="number" id="bid-amount" min="1" step="1000" required>
+            <small class="error-message" id="bid-error"></small>
+          </div>
+          <button class="button button-primary auth-submit" type="submit">Enviar oferta</button>
+          <p class="form-status" id="bid-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">A</span>
+        <span>Aurum Subastas</span>
+      </a>
+      <p>Una plataforma para publicar productos, descubrir oportunidades y ofertar con confianza.</p>
+    </div>
+
+    <div class="footer-links">
+      <div>
+        <h4>Informacion</h4>
+        <a href="#">Sobre nosotros</a>
+        <a href="#">Contacto</a>
+        <a href="#">Soporte</a>
+      </div>
+      <div>
+        <h4>Comunidad</h4>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">X / Twitter</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Terminos</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Seguridad</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

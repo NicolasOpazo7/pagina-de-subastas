@@ -1,0 +1,20 @@
+{
+  "name": "aurum-subastas",
+  "version": "1.0.0",
+  "description": "Pagina de subastas con Supabase Auth, productos y pujas.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check assets/js/supabaseClient.js && node --check assets/js/auth.js && node --check assets/js/main.js && node --check assets/js/perfil.js && node --check assets/js/subir-producto.js && node --check server.js"
+  },
+  "keywords": [
+    "subastas",
+    "supabase",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT"
+}

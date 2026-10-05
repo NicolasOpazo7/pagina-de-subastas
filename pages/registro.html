@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrarse | Aurum Subastas</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabaseClient.js"></script>
+  <script src="../assets/js/auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <header class="site-header">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">A</span>
+      <span>Aurum Subastas</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegacion principal">
+      <a href="../index.html">Inicio</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger">Categorias</button>
+        <div class="nav-dropdown-menu">
+          <a href="../index.html?category=tecnologia#productos">Tecnologia</a>
+          <a href="../index.html?category=joyeria#productos">Joyeria</a>
+          <a href="../index.html?category=hogar#productos">Hogar</a>
+          <a href="../index.html?category=relojeria#productos">Relojeria</a>
+          <a href="../index.html?category=musica#productos">Musica</a>
+          <a href="../index.html?category=fotografia#productos">Fotografia</a>
+        </div>
+      </div>
+      <a href="subir-producto.html">Publicar producto</a>
+      <a href="perfil.html">Perfil</a>
+    </nav>
+  </header>
+
+  <main class="auth-main">
+    <section class="auth-card" aria-labelledby="register-title">
+      <p class="eyebrow">Crea tu cuenta</p>
+      <h1 id="register-title">Registrarse</h1>
+      <p class="auth-copy">Prepara tu perfil para publicar productos y participar en subastas.</p>
+
+      <form class="auth-form" id="register-form" novalidate>
+        <div class="form-group">
+          <label for="register-name">Nombre</label>
+          <input type="text" id="register-name" name="name" autocomplete="name" placeholder="Tu nombre" required minlength="2">
+          <small class="error-message" data-error-for="register-name"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="register-email">Correo</label>
+          <input type="email" id="register-email" name="email" autocomplete="email" placeholder="tu@email.com" required>
+          <small class="error-message" data-error-for="register-email"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="register-role">Tipo de cuenta</label>
+          <select id="register-role" name="role" required>
+            <option value="usuario">Usuario</option>
+            <option value="subastador">Subastador</option>
+          </select>
+          <small class="error-message" data-error-for="register-role"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="register-password">Contrase&ntilde;a</label>
+          <input type="password" id="register-password" name="password" autocomplete="new-password" placeholder="M&iacute;nimo 6 caracteres" required minlength="6">
+          <small class="error-message" data-error-for="register-password"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="register-confirm-password">Repetir contrase&ntilde;a</label>
+          <input type="password" id="register-confirm-password" name="confirmPassword" autocomplete="new-password" placeholder="Repite tu contrase&ntilde;a" required minlength="6">
+          <small class="error-message" data-error-for="register-confirm-password"></small>
+        </div>
+
+        <button class="button button-primary auth-submit" type="submit">Crear cuenta</button>
+        <p class="form-status" id="register-status" aria-live="polite"></p>
+      </form>
+
+      <div class="auth-divider"><span>o</span></div>
+      <button class="google-button" type="button" id="google-register">
+        <span class="google-icon">G</span>
+        Registrarse con Google
+      </button>
+
+      <p class="auth-switch">&iquest;Ya tienes cuenta? <a href="login.html">Iniciar sesi&oacute;n</a></p>
+    </section>
+  </main>
+</body>
+</html>
