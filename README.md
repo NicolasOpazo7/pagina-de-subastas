@@ -9,6 +9,7 @@ Proyecto web de subastas con HTML, CSS, JavaScript y Supabase.
 - `assets/css/`: estilos del sitio.
 - `assets/js/`: logica de autenticacion, productos, pujas y Supabase.
 - `database/`: SQL para crear tablas, politicas y funciones en Supabase.
+- `docs/`: analisis tecnico y tareas priorizadas.
 - `server.js`: servidor local sin dependencias.
 
 ## Ejecutar en VS Code
@@ -50,3 +51,8 @@ En Google Cloud, el redirect URI autorizado debe ser:
 ```text
 https://qiiqelydamghbzowgkof.supabase.co/auth/v1/callback
 ```
+
+## Analisis tecnico
+
+- `docs/analisis-y-tareas.md`: resumen inicial de mejoras.
+- `docs/revision-tecnica-detallada.md`: hallazgos por severidad y plan de trabajo recomendado.
