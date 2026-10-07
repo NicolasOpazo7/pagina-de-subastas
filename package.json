@@ -8,6 +8,7 @@
     "test:local": "node --experimental-sqlite tests/local-api.test.js",
     "test:e2e": "node --experimental-sqlite tests/browser.test.js",
     "test:restart": "node --experimental-sqlite tests/restart.test.js",
+    "test:unit": "node --experimental-sqlite tests/unit.test.js",
     "start": "node --experimental-sqlite server.js",
     "dev": "node --experimental-sqlite server.js",
     "dev:local": "node --experimental-sqlite backend/start.js",

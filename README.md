@@ -55,6 +55,7 @@ La recuperacion de contrasena funciona en desarrollo: el correo de prueba se gua
 
 ```sh
 npm run check
+npm run test:unit
 npm test
 npm run test:local
 npm run test:e2e

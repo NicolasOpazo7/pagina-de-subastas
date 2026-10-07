@@ -38,6 +38,7 @@ Las imagenes se decodifican y vuelven a codificar. No se permiten SVG ejecutable
 ## Verificacion
 
 - Sintaxis de backend/frontend/pruebas/scripts.
+- Unitarias: sales de Argon2id, verificacion de contrasenas, montos enteros y descarte de contenido agregado en imagenes.
 - Smoke: recursos, redirecciones antiguas, rutas inexistentes y bloqueo de archivos privados.
 - Integracion: cuentas, restricciones de roles, fotos falsas/exceso, borrador/publicacion, ofertas simultaneas e idempotencia, bloqueo de edicion, reserva no alcanzada, sin ofertas, cierre duplicado, chat privado, confirmacion doble, administracion, reset de un uso y datos persistentes.
 - E2E Playwright: dos usuarios, publicacion con dos fotos, filtros, puja, actualizacion del vendedor, bloqueo de edicion, cierre, acuerdo/chat y menu movil sin desbordamiento. Capturas en docs/screenshots.
