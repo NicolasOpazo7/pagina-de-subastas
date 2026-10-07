@@ -1,4 +1,10 @@
 node_modules/
+data/
+data-demo/
+.npm-cache/
+playwright-report/
+test-results/
+docs/screenshots/
 .env
 .env.*
 !.env.example

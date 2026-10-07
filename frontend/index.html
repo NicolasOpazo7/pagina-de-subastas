@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Aurum Subastas: descubre articulos unicos, oferta y coordina tu compra con la comunidad."
+    />
+    <meta name="theme-color" content="#0B0D10" />
+    <title>Aurum Subastas</title>
+    <link rel="stylesheet" href="/frontend/app.css" />
+    <script src="/vendor/lucide.js" defer></script>
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="/frontend/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main" data-action="skip">Ir al contenido</a>
+    <header id="header" class="site-header"></header>
+    <main id="main" tabindex="-1"><div class="loading">Cargando Aurum...</div></main>
+    <footer id="footer"></footer>
+    <dialog id="modal" aria-labelledby="modal-title"></dialog>
+    <div id="toasts" aria-live="polite" aria-atomic="false"></div>
+  </body>
+</html>

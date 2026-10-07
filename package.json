@@ -1,12 +1,21 @@
 {
   "name": "aurum-subastas",
   "version": "1.0.0",
-  "description": "Pagina de subastas con Supabase Auth, productos y pujas.",
+  "description": "Plataforma de subastas con SQLite local, roles y pujas en tiempo real.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "check": "node --check assets/js/supabaseClient.js && node --check assets/js/categories.js && node --check assets/js/auth.js && node --check assets/js/main.js && node --check assets/js/perfil.js && node --check assets/js/producto.js && node --check assets/js/subir-producto.js && node --check server.js"
+    "test": "node --experimental-sqlite tests/smoke.test.js",
+    "test:local": "node --experimental-sqlite tests/local-api.test.js",
+    "test:e2e": "node --experimental-sqlite tests/browser.test.js",
+    "test:restart": "node --experimental-sqlite tests/restart.test.js",
+    "start": "node --experimental-sqlite server.js",
+    "dev": "node --experimental-sqlite server.js",
+    "dev:local": "node --experimental-sqlite backend/start.js",
+    "check": "node scripts/check.js",
+    "format": "prettier --write frontend backend scripts tests server.js docs/openapi.yaml",
+    "seed": "node --experimental-sqlite backend/seed.js",
+    "dev:demo": "node --experimental-sqlite backend/demo.js",
+    "admin:create": "node --experimental-sqlite backend/admin.js"
   },
   "keywords": [
     "subastas",
@@ -16,5 +25,17 @@
     "javascript"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "jpeg-js": "^0.4.4",
+    "lucide": "^1.52.0",
+    "nodemailer": "^10.0.15",
+    "pngjs": "^7.0.0",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "prettier": "^3.9.9"
+  }
 }
