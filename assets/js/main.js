@@ -19,8 +19,20 @@ const bidCurrentPrice = document.querySelector("#bid-current-price");
 const bidAmount = document.querySelector("#bid-amount");
 const bidError = document.querySelector("#bid-error");
 const bidStatus = document.querySelector("#bid-status");
+const bidSubmit = bidForm.querySelector("[type='submit']");
 let productCards = Array.from(document.querySelectorAll(".product-card"));
 let activeBidProduct = null;
+productGrid.replaceChildren();
+productCards = [];
+let catalogReady = false;
+const retryProducts = document.createElement('button');
+retryProducts.type = 'button';
+retryProducts.className = 'button button-secondary';
+retryProducts.textContent = 'Reintentar carga';
+retryProducts.hidden = true;
+emptyResults.after(retryProducts);
+retryProducts.addEventListener('click', loadProductsFromSupabase);
+document.querySelector('#search-form').addEventListener('submit', event => event.preventDefault());
 
 function normalizeText(text) {
   return text
@@ -135,6 +147,7 @@ function productMatchesFilters(card) {
 }
 
 function applyProductFilters() {
+  if (!catalogReady) return;
   const query = normalizeText(searchInput.value.trim());
   let visibleCount = 0;
 
@@ -177,6 +190,7 @@ function applyInitialCategoryFromUrl() {
 function renderProductCard(product) {
   const card = document.createElement("article");
   const images = getProductImages(product);
+  const detailUrl = `pages/producto.html?id=${encodeURIComponent(product.id)}`;
   card.className = "product-card";
   card.dataset.id = product.id;
   card.dataset.name = product.title;
@@ -201,6 +215,7 @@ function renderProductCard(product) {
       </div>
       <h3>${escapeHtml(product.title)}</h3>
       <p>${escapeHtml(product.description)}</p>
+      <a class="text-link card-detail-link" href="${detailUrl}">Ver detalle</a>
       <div class="bid-row">
         <div>
           <span class="label">Oferta mas alta</span>
@@ -266,6 +281,10 @@ function closeBidModal() {
 }
 
 async function placeBid(productId, amount) {
+  if (bidSubmit.disabled) {
+    return;
+  }
+
   const user = await getSessionUser();
 
   if (!user) {
@@ -279,28 +298,33 @@ async function placeBid(productId, amount) {
   }
 
   bidStatus.textContent = "Enviando oferta...";
+  setLoading(bidSubmit, true, "Enviando...");
 
-  const { data, error } = await db.rpc("place_bid", {
-    product_id: productId,
-    bid_amount: amount
-  });
+  try {
+    const { data, error } = await db.rpc("place_bid", {
+      product_id: productId,
+      bid_amount: amount
+    });
 
-  if (error) {
-    bidStatus.textContent = "";
-    bidError.textContent = error.message;
-    return;
+    if (error) {
+      bidStatus.textContent = "";
+      bidError.textContent = getErrorMessage(error);
+      return;
+    }
+
+    const card = productCards.find((item) => item.dataset.id === data.id);
+
+    if (card) {
+      card.dataset.price = data.current_price;
+      card.dataset.currentPrice = data.current_price;
+      card.querySelector(".bid-row strong").textContent = formatPrice(data.current_price);
+    }
+
+    closeBidModal();
+    applyProductFilters();
+  } finally {
+    setLoading(bidSubmit, false);
   }
-
-  const card = productCards.find((item) => item.dataset.id === data.id);
-
-  if (card) {
-    card.dataset.price = data.current_price;
-    card.dataset.currentPrice = data.current_price;
-    card.querySelector(".bid-row strong").textContent = formatPrice(data.current_price);
-  }
-
-  closeBidModal();
-  applyProductFilters();
 }
 
 function bindBidButtons() {
@@ -309,12 +333,32 @@ function bindBidButtons() {
   });
 }
 
+function bindStaticDetailLinks() {
+  productCards.forEach((card) => {
+    if (card.querySelector(".card-detail-link") || !card.dataset.id) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.className = "text-link card-detail-link";
+    link.href = `pages/producto.html?id=${encodeURIComponent(card.dataset.id)}`;
+    link.textContent = "Ver detalle";
+    card.querySelector(".card-content")?.insertBefore(link, card.querySelector(".bid-row"));
+  });
+}
+
 async function loadProductsFromSupabase() {
+  catalogReady = false;
+  retryProducts.hidden = true;
+  productGrid.setAttribute('aria-busy', 'true');
+  resultCount.textContent = 'Cargando subastas...';
+  emptyResults.hidden = true;
+  try {
   if (!window.supabase || !db) {
-    bindBidButtons();
-    applyProductFilters();
-    return;
+    throw new Error('Servicio no disponible');
   }
+
+  await closeExpiredAuctions();
 
   const { data, error } = await db
     .from("products")
@@ -323,19 +367,27 @@ async function loadProductsFromSupabase() {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error || !data || data.length === 0) {
-    bindBidButtons();
-    applyProductFilters();
-    return;
-  }
+  if (error) throw error;
 
   productGrid.innerHTML = "";
-  data.forEach((product) => productGrid.appendChild(renderProductCard(product)));
+  (data || []).filter(product => new Date(product.ends_at).getTime() > Date.now()).forEach((product) => productGrid.appendChild(renderProductCard(product)));
   productCards = Array.from(document.querySelectorAll(".product-card"));
   bindBidButtons();
   startCarousels();
   applyInitialCategoryFromUrl();
+  catalogReady = true;
+  emptyResults.textContent = 'No hay productos que coincidan con tu busqueda.';
   applyProductFilters();
+  } catch {
+    productGrid.replaceChildren();
+    productCards = [];
+    resultCount.textContent = 'Catalogo no disponible';
+    emptyResults.textContent = 'No pudimos cargar las subastas. Comprueba tu conexion e intenta nuevamente.';
+    emptyResults.hidden = false;
+    retryProducts.hidden = false;
+  } finally {
+    productGrid.setAttribute('aria-busy', 'false');
+  }
 }
 
 if (filterToggle && filterPanel) {

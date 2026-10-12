@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabaseClient.js"></script>
+  <script src="assets/js/categories.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </head>
 <body>
@@ -21,14 +22,7 @@
       <a href="index.html" class="active">Inicio</a>
       <div class="nav-dropdown">
         <button type="button" class="nav-dropdown-trigger">Categorias</button>
-        <div class="nav-dropdown-menu">
-          <a href="index.html?category=tecnologia#productos">Tecnologia</a>
-          <a href="index.html?category=joyeria#productos">Joyeria</a>
-          <a href="index.html?category=hogar#productos">Hogar</a>
-          <a href="index.html?category=relojeria#productos">Relojeria</a>
-          <a href="index.html?category=musica#productos">Musica</a>
-          <a href="index.html?category=fotografia#productos">Fotografia</a>
-        </div>
+        <div class="nav-dropdown-menu" data-category-menu></div>
       </div>
       <a href="pages/subir-producto.html">Publicar producto</a>
       <a href="pages/perfil.html">Perfil</a>
@@ -39,7 +33,8 @@
     <section class="hero">
       <div class="hero-content">
         <p class="eyebrow">Subastas destacadas</p>
-        <h1>Encuentra piezas unicas y oferta antes de que cierre el martillo.</h1>
+        <h1>Aurum Subastas</h1>
+        <p class="hero-tagline">Cada puja es una oportunidad.</p>
         <p class="hero-copy">
           Explora productos publicados por la comunidad, revisa la oferta actual
           y entra a competir por tus favoritos.
@@ -73,15 +68,7 @@
 
         <div class="filter-group">
           <label for="category-filter">Categoria</label>
-          <select id="category-filter">
-            <option value="all">Todas</option>
-            <option value="relojeria">Relojeria</option>
-            <option value="joyeria">Joyeria</option>
-            <option value="tecnologia">Tecnologia</option>
-            <option value="hogar">Hogar</option>
-            <option value="musica">Musica</option>
-            <option value="fotografia">Fotografia</option>
-          </select>
+          <select id="category-filter"></select>
         </div>
 
         <div class="filter-group">
@@ -118,7 +105,7 @@
           <p class="eyebrow">En tendencia</p>
           <h2>Productos destacados</h2>
         </div>
-        <p class="result-count" id="result-count">6 productos encontrados</p>
+        <p class="result-count" id="result-count" aria-live="polite">Cargando subastas...</p>
       </div>
 
       <div class="product-grid">

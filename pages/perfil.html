@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/supabaseClient.js"></script>
+  <script src="../assets/js/categories.js" defer></script>
   <script src="../assets/js/perfil.js" defer></script>
 </head>
 <body>
@@ -20,14 +21,7 @@
       <a href="../index.html">Inicio</a>
       <div class="nav-dropdown">
         <button type="button" class="nav-dropdown-trigger">Categorias</button>
-        <div class="nav-dropdown-menu">
-          <a href="../index.html?category=tecnologia#productos">Tecnologia</a>
-          <a href="../index.html?category=joyeria#productos">Joyeria</a>
-          <a href="../index.html?category=hogar#productos">Hogar</a>
-          <a href="../index.html?category=relojeria#productos">Relojeria</a>
-          <a href="../index.html?category=musica#productos">Musica</a>
-          <a href="../index.html?category=fotografia#productos">Fotografia</a>
-        </div>
+        <div class="nav-dropdown-menu" data-category-menu></div>
       </div>
       <a href="subir-producto.html">Publicar producto</a>
       <a href="perfil.html" class="active">Perfil</a>
@@ -133,7 +127,21 @@
             </div>
           </div>
 
-          <div class="deal-list" id="deal-list"></div>
+          <div class="deal-section">
+            <div class="deal-section-heading">
+              <h3>Activos</h3>
+              <span id="active-deals-count">0</span>
+            </div>
+            <div class="deal-list" id="active-deal-list"></div>
+          </div>
+
+          <div class="deal-section">
+            <div class="deal-section-heading">
+              <h3>Completados</h3>
+              <span id="completed-deals-count">0</span>
+            </div>
+            <div class="deal-list" id="completed-deal-list"></div>
+          </div>
           <p class="empty-results" id="deal-empty" hidden>No hay acuerdos de venta por ahora.</p>
         </article>
       </section>
@@ -158,14 +166,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="edit-category">Categoria</label>
-              <select id="edit-category" required>
-                <option value="tecnologia">Tecnologia</option>
-                <option value="joyeria">Joyeria</option>
-                <option value="hogar">Hogar</option>
-                <option value="relojeria">Relojeria</option>
-                <option value="musica">Musica</option>
-                <option value="fotografia">Fotografia</option>
-              </select>
+              <select id="edit-category" required></select>
             </div>
             <div class="form-group">
               <label for="edit-ends">Fecha de cierre</label>

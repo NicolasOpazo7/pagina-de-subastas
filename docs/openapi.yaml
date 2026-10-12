@@ -1,0 +1,346 @@
+openapi: 3.0.3
+info:
+  title: Aurum Subastas API
+  version: 2.0.0
+  description: API local. Montos enteros CLP, fechas ISO UTC y sesiones mediante cookie HttpOnly.
+servers:
+  - url: http://localhost:5500/api
+security:
+  - session: []
+paths:
+  /health:
+    get:
+      security: []
+      summary: Hora oficial del servidor y estado SQLite
+      responses: { '200': { description: Disponible } }
+  /config:
+    get:
+      security: []
+      summary: Disponibilidad de Google sin exponer secretos
+      responses: { '200': { description: Configuracion publica } }
+  /auth/register:
+    post:
+      security: []
+      summary: Registro publico de cliente o subastador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Register' }
+      responses:
+        {
+          '201': { description: Cuenta y sesion creadas },
+          '400': { description: Validacion fallida },
+          '409': { description: Correo duplicado },
+          '429': { description: Limite de intentos },
+        }
+  /auth/login:
+    post:
+      security: []
+      summary: Iniciar sesion con correo y contrasena
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties: { email: { type: string, format: email }, password: { type: string } }
+      responses:
+        {
+          '200': { description: Sesion iniciada },
+          '401': { description: Credenciales incorrectas },
+        }
+  /auth/me:
+    get:
+      security: []
+      summary: Usuario actual o null
+      responses: { '200': { description: Sesion actual } }
+  /auth/logout:
+    post:
+      summary: Invalidar sesion actual
+      responses: { '200': { description: Sesion cerrada } }
+  /auth/forgot-password:
+    post:
+      security: []
+      summary: Solicitar recuperacion mediante correo en buzon local
+      responses:
+        {
+          '200': { description: Mensaje generico sin confirmar existencia de cuenta },
+          '503': { description: Envio de correo de produccion no configurado },
+        }
+  /auth/reset-password:
+    post:
+      security: []
+      summary: Restablecer usando token temporal y password/confirm_password
+      responses:
+        {
+          '200': { description: Contrasena cambiada y sesiones invalidadas },
+          '400': { description: Token invalido o expirado },
+        }
+  /auth/google:
+    get:
+      security: []
+      summary: Iniciar OAuth con role y terms=1
+      responses:
+        {
+          '302': { description: Redireccion a Google },
+          '503': { description: Google no configurado },
+        }
+  /auth/google/callback:
+    get:
+      security: []
+      summary: Consumir codigo y estado de Google
+      responses:
+        { '302': { description: Acceso al panel }, '400': { description: Solicitud invalida } }
+  /users/me:
+    get:
+      summary: Consultar perfil propio
+      responses: { '200': { description: Perfil } }
+    patch:
+      summary: Actualizar first_name, last_name, avatar y notifications_enabled
+      responses:
+        { '200': { description: Perfil actualizado }, '401': { description: Sesion requerida } }
+  /users/me/password:
+    patch:
+      summary: Cambiar current_password por password/confirm_password e invalidar otras sesiones
+      responses:
+        {
+          '200': { description: Contrasena actualizada },
+          '400': { description: Validacion fallida },
+        }
+  /categories:
+    get:
+      security: []
+      summary: Categorias y cantidad real de subastas activas
+      responses: { '200': { description: Categorias } }
+  /stats:
+    get:
+      security: []
+      summary: Estadisticas publicas agregadas
+      responses: { '200': { description: Conteos } }
+  /auctions:
+    get:
+      security: []
+      summary: Catalogo paginado (12 elementos), q, category, min, max, location, state, featured, no_bids, closing, sort y page
+      responses: { '200': { description: items, total, page y page_size } }
+    post:
+      summary: Crear publicacion o borrador; solo subastador
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Auction' }
+      responses:
+        {
+          '201': { description: Publicacion creada },
+          '400': { description: Datos invalidos },
+          '403': { description: Rol no permitido },
+        }
+  /auctions/mine:
+    get:
+      summary: Publicaciones del subastador actual
+      responses: { '200': { description: Publicaciones propias } }
+  /auctions/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    get:
+      security: []
+      summary: Detalle publico; borradores solo disponibles al propietario/admin
+      responses: { '200': { description: Detalle }, '404': { description: No disponible } }
+    patch:
+      summary: Editar publicacion propia sin pujas
+      responses:
+        {
+          '200': { description: Actualizada },
+          '409': { description: Edicion bloqueada por pujas o estado },
+        }
+    delete:
+      summary: Eliminar publicacion propia sin pujas ni reportes
+      responses: { '200': { description: Eliminada }, '409': { description: Operacion bloqueada } }
+  /auctions/{id}/publish:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Publicar borrador propio validado
+      responses: { '200': { description: Publicado }, '400': { description: Faltan datos } }
+  /auctions/{id}/cancel:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Cancelar publicacion sin pujas
+      responses: { '200': { description: Cancelada }, '409': { description: Operacion bloqueada } }
+  /auctions/{id}/bids:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    get:
+      security: []
+      summary: Historial publico anonimizado de ultimas 100 pujas
+      responses: { '200': { description: Historial } }
+    post:
+      summary: Oferta atomica e idempotente; solo cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, idempotency_key]
+              properties:
+                {
+                  amount: { type: integer, minimum: 1 },
+                  idempotency_key: { type: string, minLength: 8, maxLength: 128 },
+                }
+      responses:
+        {
+          '201': { description: Aceptada o reintento de oferta ya aceptada },
+          '409': { description: Oferta insuficiente, cierre o conflicto },
+        }
+  /auctions/{id}/report:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Reportar con reason y description
+      responses: { '201': { description: Reporte recibido } }
+  /users/me/bids:
+    get:
+      summary: Mayor puja propia por subasta
+      responses: { '200': { description: Participacion del cliente } }
+  /favorites:
+    get:
+      summary: Favoritos propios
+      responses: { '200': { description: Favoritos } }
+  /favorites/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Agregar favorito sin duplicados
+      responses: { '200': { description: Agregado } }
+    delete:
+      summary: Quitar favorito
+      responses: { '200': { description: Eliminado } }
+  /notifications:
+    get:
+      summary: Ultimas 100 notificaciones propias
+      responses: { '200': { description: Notificaciones } }
+  /notifications/read-all:
+    patch:
+      summary: Marcar todas como leidas
+      responses: { '200': { description: Actualizadas } }
+  /notifications/{id}/read:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    patch:
+      summary: Marcar una notificacion propia
+      responses: { '200': { description: Actualizada } }
+  /deals:
+    get:
+      summary: Acuerdos en los que participa el usuario
+      responses: { '200': { description: Acuerdos } }
+  /deals/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    get:
+      summary: Detalle privado para comprador/subastador
+      responses: { '200': { description: Acuerdo }, '404': { description: No disponible } }
+  /deals/{id}/messages:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    get:
+      summary: Mensajes privados del acuerdo
+      responses: { '200': { description: Mensajes } }
+    post:
+      summary: Enviar message de hasta 2000 caracteres
+      responses: { '201': { description: Mensaje guardado } }
+  /deals/{id}/confirm:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Confirmar acuerdo; completado solo tras confirmacion doble
+      responses: { '200': { description: Confirmacion registrada } }
+  /deals/{id}/incident:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    post:
+      summary: Registrar incidencia y reporte administrativo
+      responses: { '200': { description: Incidencia guardada } }
+  /admin/stats:
+    get:
+      summary: Estadisticas globales; solo admin
+      responses: { '200': { description: Estadisticas }, '403': { description: No autorizado } }
+  /admin/users:
+    get:
+      summary: Buscar por q y filtrar por role; maximo 200
+      responses: { '200': { description: Usuarios } }
+  /admin/users/{id}/status:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    patch:
+      summary: Suspender/reactivar con status y reason
+      responses: { '200': { description: Estado actualizado } }
+  /admin/auctions:
+    get:
+      summary: Ultimas 200 publicaciones
+      responses: { '200': { description: Publicaciones } }
+  /admin/auctions/{id}/moderation:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    patch:
+      summary: Revisar con state, reason y featured
+      responses: { '200': { description: Revision registrada } }
+  /admin/reports:
+    get:
+      summary: Ultimos 200 reportes
+      responses: { '200': { description: Reportes } }
+  /admin/reports/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/Id' }
+    patch:
+      summary: Marcar reviewed o dismissed
+      responses: { '200': { description: Reporte revisado } }
+  /admin/audit-logs:
+    get:
+      summary: Ultimos 200 eventos de auditoria
+      responses: { '200': { description: Auditoria } }
+components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: aurum_session }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string } }
+  schemas:
+    Register:
+      type: object
+      required: [first_name, last_name, email, password, confirm_password, role, accept_terms]
+      properties:
+        first_name: { type: string, minLength: 2, maxLength: 60 }
+        last_name: { type: string, minLength: 2, maxLength: 60 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
+        confirm_password: { type: string }
+        role: { type: string, enum: [usuario, subastador] }
+        accept_terms: { type: boolean, enum: [true] }
+    Auction:
+      type: object
+      required: [title, description, category, starting_price, ends_at]
+      properties:
+        title: { type: string, minLength: 2, maxLength: 160 }
+        description: { type: string, minLength: 5, maxLength: 10000 }
+        category: { type: string }
+        brand: { type: string }
+        model: { type: string }
+        condition: { type: string, enum: [new, like_new, used, restored] }
+        location: { type: string }
+        features: { type: string }
+        starting_price: { type: integer, minimum: 1 }
+        minimum_increment: { type: integer, minimum: 1, default: 1000 }
+        reserve_price: { type: integer, minimum: 1, nullable: true }
+        starts_at: { type: string, format: date-time }
+        ends_at: { type: string, format: date-time }
+        delivery_terms: { type: string }
+        draft: { type: boolean }
+        images:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            properties:
+              id: { type: string, description: ID de imagen existente para edicion }
+              data: { type: string, description: Data URL de JPG/PNG; maximo 5 MB decodificados }

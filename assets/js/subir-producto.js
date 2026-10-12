@@ -7,6 +7,7 @@ const productPrice = document.querySelector("#product-price");
 const productImages = document.querySelector("#product-images");
 const productEnds = document.querySelector("#product-ends");
 const productFeatured = document.querySelector("#product-featured");
+const uploadSubmit = uploadForm.querySelector("[type='submit']");
 let currentUserId = null;
 
 async function requireSellerSession() {
@@ -99,6 +100,10 @@ async function saveProductImages(productId) {
 async function createProduct(event) {
   event.preventDefault();
 
+  if (uploadSubmit.disabled) {
+    return;
+  }
+
   if (!currentUserId) {
     return;
   }
@@ -107,6 +112,11 @@ async function createProduct(event) {
 
   if (!productTitle.value.trim() || !productDescription.value.trim() || !productCategory.value || productPrice.value === "" || !productEnds.value) {
     uploadStatus.textContent = "Completa todos los campos obligatorios.";
+    return;
+  }
+
+  if (!isFutureDateTime(productEnds.value)) {
+    uploadStatus.textContent = "La fecha de cierre debe ser posterior al momento actual.";
     return;
   }
 
@@ -126,6 +136,7 @@ async function createProduct(event) {
   }
 
   try {
+    setLoading(uploadSubmit, true, "Publicando...");
     uploadStatus.textContent = "Publicando producto...";
     await ensureProductImagesBucket();
 
@@ -158,7 +169,9 @@ async function createProduct(event) {
     uploadStatus.textContent = "Producto publicado correctamente. Puedes verlo en tu perfil.";
     uploadForm.reset();
   } catch (error) {
-    uploadStatus.textContent = `No se pudo publicar: ${error.message}`;
+    uploadStatus.textContent = `No se pudo publicar: ${getErrorMessage(error)}`;
+  } finally {
+    setLoading(uploadSubmit, false);
   }
 }
 
